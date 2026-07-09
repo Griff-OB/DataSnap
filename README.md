@@ -57,7 +57,6 @@ An optional local AI assistant can also provide dataset explanations and cleanin
 
 ![Local AI Assistant](./screenshots/aiassistantsection.png)
 
-
 ---
 
 ## Features
