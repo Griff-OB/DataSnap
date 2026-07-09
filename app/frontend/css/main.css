@@ -1,0 +1,651 @@
+/* ==========================================================================
+   main.css - Main Stylesheet for Data Wrangler Application
+   ========================================================================== */
+/* --------------------------------------------------------------------------
+   Theme Variables
+   -------------------------------------------------------------------------- */
+:root {
+  /* Apple-inspired Light Theme (Default) */
+  --apple-blue: #007AFF;
+  --apple-blue-hover: #0051D5;
+  --apple-gray: #8E8E93;
+  --apple-gray-light: #C7C7CC;
+  --apple-gray-lighter: #E5E5EA;
+  --apple-gray-ultralight: #F2F2F7;
+  --apple-black: #1C1C1E;
+  --apple-white: #FFFFFF;
+  --apple-shadow-light: rgba(0, 0, 0, 0.1);
+  --apple-shadow-medium: rgba(0, 0, 0, 0.15);
+  --apple-border-radius: 12px;
+  --apple-transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+  
+  /* Theme variables that will change based on selected theme */
+  --primary-color: var(--apple-blue);
+  --primary-hover: var(--apple-blue-hover);
+  --text-color: var(--apple-black);
+  --text-secondary: var(--apple-gray);
+  --bg-color: var(--apple-gray-ultralight);
+  --header-bg: var(--apple-white);
+  --sidebar-bg: var(--apple-white);
+  --card-bg: var(--apple-white);
+  --input-bg: var(--apple-white);
+  --secondary-bg: var(--apple-white);
+  --secondary-hover: var(--apple-gray-ultralight);
+  --border-color: var(--apple-gray-lighter);
+  --progress-bg: var(--apple-gray-lighter);
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+  --primary-color: #0A84FF;
+  --primary-hover: #409CFF;
+  --text-color: #F2F2F7;
+  --text-secondary: #AEAEB2;
+  --bg-color: #000000;
+  --header-bg: #1C1C1E;
+  --sidebar-bg: #1C1C1E;
+  --card-bg: #2C2C2E;
+  --input-bg: #3A3A3C;
+  --secondary-bg: #2C2C2E;
+  --secondary-hover: #3A3A3C;
+  --border-color: #38383A;
+  --progress-bg: #38383A;
+}
+
+/* Blue Theme */
+[data-theme="blue"] {
+  --primary-color: #007AFF;
+  --primary-hover: #0051D5;
+  --text-color: #1C1C1E;
+  --text-secondary: #8E8E93;
+  --bg-color: #F0F8FF;
+  --header-bg: #E6F2FF;
+  --sidebar-bg: #E6F2FF;
+  --card-bg: #FFFFFF;
+  --input-bg: #FFFFFF;
+  --secondary-bg: #FFFFFF;
+  --secondary-hover: #F0F8FF;
+  --border-color: #CCE5FF;
+  --progress-bg: #E6F2FF;
+}
+
+/* Green Theme */
+[data-theme="green"] {
+  --primary-color: #32D74B;
+  --primary-hover: #28A745;
+  --text-color: #1C1C1E;
+  --text-secondary: #8E8E93;
+  --bg-color: #F0FFF4;
+  --header-bg: #E6FFE9;
+  --sidebar-bg: #E6FFE9;
+  --card-bg: #FFFFFF;
+  --input-bg: #FFFFFF;
+  --secondary-bg: #FFFFFF;
+  --secondary-hover: #F0FFF4;
+  --border-color: #CCE6D0;
+  --progress-bg: #E6FFE9;
+}
+
+/* Purple Theme */
+[data-theme="purple"] {
+  --primary-color: #AF52DE;
+  --primary-hover: #9043C2;
+  --text-color: #1C1C1E;
+  --text-secondary: #8E8E93;
+  --bg-color: #F8F0FF;
+  --header-bg: #F0E6FF;
+  --sidebar-bg: #F0E6FF;
+  --card-bg: #FFFFFF;
+  --input-bg: #FFFFFF;
+  --secondary-bg: #FFFFFF;
+  --secondary-hover: #F8F0FF;
+  --border-color: #E6D6FF;
+  --progress-bg: #F0E6FF;
+}
+
+/* --------------------------------------------------------------------------
+   Global Styles
+   -------------------------------------------------------------------------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  line-height: 1.5;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  transition: var(--apple-transition);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* --------------------------------------------------------------------------
+   App Layout
+   -------------------------------------------------------------------------- */
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  max-width: 1800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   Header
+   -------------------------------------------------------------------------- */
+.app-header {
+  background-color: var(--header-bg);
+  border-bottom: 1px solid var(--border-color);
+  padding: 1.25rem 2.5rem;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+  backdrop-filter: saturate(180%);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1800px;
+  margin: 0 auto;
+}
+
+.logo-section h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.app-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0.25rem 0 0 0;
+  font-weight: 400;
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+/* --------------------------------------------------------------------------
+   Sidebar
+   -------------------------------------------------------------------------- */
+.sidebar {
+  width: 280px;
+  background-color: var(--sidebar-bg);
+  border-right: 1px solid var(--border-color);
+  padding: 2rem;
+  overflow-y: auto;
+  flex-shrink: 0;
+  box-shadow: 1px 0 0 rgba(0, 0, 0, 0.04);
+}
+
+.sidebar-section {
+  margin-bottom: 2.5rem;
+}
+
+.sidebar-section h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  color: var(--text-color);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.upload-section,
+.export-options,
+.session-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.operation-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* --------------------------------------------------------------------------
+   Content Area
+   -------------------------------------------------------------------------- */
+.content-area {
+  flex: 1;
+  padding: 2.5rem;
+  overflow-y: auto;
+  background-color: var(--bg-color);
+}
+
+.content-section {
+  display: none;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.content-section.active {
+  display: block;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+}
+
+.section-header h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-color);
+  letter-spacing: -0.02em;
+}
+
+.section-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+/* --------------------------------------------------------------------------
+   Buttons
+   -------------------------------------------------------------------------- */
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: var(--apple-border-radius);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--apple-transition);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  outline: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: var(--apple-white);
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 122, 255, 0.2);
+}
+
+.btn-secondary {
+  background-color: var(--secondary-bg);
+  color: var(--primary-color);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--secondary-hover);
+  border-color: var(--primary-color);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-operation {
+  width: 100%;
+  justify-content: flex-start;
+  padding: 0.875rem 1.25rem;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  border-radius: var(--apple-border-radius);
+  text-align: left;
+  font-weight: 500;
+}
+
+.btn-operation:hover {
+  background-color: var(--secondary-hover);
+  border-color: var(--primary-color);
+}
+
+.btn-operation.active {
+  background-color: var(--primary-color);
+  color: var(--apple-white);
+  border-color: var(--primary-color);
+}
+
+/* --------------------------------------------------------------------------
+   Forms & Inputs
+   -------------------------------------------------------------------------- */
+.form-control {
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--apple-border-radius);
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  font-size: 0.95rem;
+  width: 100%;
+  margin-bottom: 0.75rem;
+  transition: var(--apple-transition);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15);
+}
+
+.theme-selector,
+.filter-input {
+  min-width: 220px;
+}
+
+/* --------------------------------------------------------------------------
+   Table (Tabulator) - THEME-INDEPENDENT STYLING
+   -------------------------------------------------------------------------- */
+.table-container {
+  background-color: #FFFFFF; /* Locked to white */
+  border-radius: var(--apple-border-radius);
+  border: 1px solid #E5E5EA; /* Locked to light gray */
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+#data-table {
+  height: 500px;
+}
+
+.tabulator {
+  background-color: #FFFFFF; /* Locked to white */
+  border: none;
+  color: #1C1C1E; /* Locked to black */
+}
+
+.tabulator .tabulator-header {
+  background-color: #FFFFFF; /* Locked to white */
+  border-bottom: 1px solid #E5E5EA; /* Locked to light gray */
+  font-weight: 600;
+}
+
+.tabulator .tabulator-header .tabulator-col {
+  background-color: #FFFFFF; /* Locked to white */
+  border-right: none;
+  color: #1C1C1E; /* Locked to black */
+  padding: 1rem;
+}
+
+.tabulator .tabulator-header .tabulator-col .tabulator-col-content {
+  padding: 0.5rem;
+}
+
+.tabulator .tabulator-row {
+  border-bottom: 1px solid #E5E5EA; /* Locked to light gray */
+  transition: var(--apple-transition);
+}
+
+.tabulator .tabulator-row:nth-child(even) {
+  background-color: #F2F2F7; /* Locked to ultralight gray for striping */
+}
+
+.tabulator .tabulator-row:hover {
+  background-color: #E5E5EA; /* Locked to lighter gray for hover */
+}
+
+.tabulator-placeholder span {
+  color: #8E8E93; /* Locked to medium gray */
+  font-size: 1rem;
+  padding: 2rem;
+}
+
+/* --------------------------------------------------------------------------
+   Pagination
+   -------------------------------------------------------------------------- */
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+#page-info {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+/* --------------------------------------------------------------------------
+   Cards & Panels (Cleaning, Transform, Profile)
+   -------------------------------------------------------------------------- */
+.cleaning-options,
+.transform-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.75rem;
+}
+
+.cleaning-card,
+.transform-card {
+  background-color: var(--card-bg);
+  border-radius: var(--apple-border-radius);
+  padding: 1.75rem;
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  transition: var(--apple-transition);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.cleaning-card:hover,
+.transform-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+}
+
+.cleaning-card h3,
+.transform-card h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  color: var(--text-color);
+}
+
+.cleaning-card .btn-primary,
+.transform-card .btn-primary {
+  margin-top: auto;
+  align-self: flex-start;
+}
+
+.profile-content {
+  background-color: var(--card-bg);
+  border-radius: var(--apple-border-radius);
+  padding: 2.25rem;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+.file-info {
+  background-color: var(--card-bg);
+  border-radius: var(--apple-border-radius);
+  padding: 1.25rem;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.file-info p {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.file-info p strong {
+  color: var(--text-color);
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   Visualization & Charts
+   -------------------------------------------------------------------------- */
+.viz-controls {
+  display: flex;
+  gap: 1.25rem;
+  margin-bottom: 2.25rem;
+  flex-wrap: wrap;
+}
+
+.chart-container {
+  background-color: var(--card-bg);
+  border-radius: var(--apple-border-radius);
+  padding: 2.25rem;
+  border: 1px solid var(--border-color);
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+/* --------------------------------------------------------------------------
+   UI Components (Progress Bar, etc.)
+   -------------------------------------------------------------------------- */
+.progress-container {
+  width: 100%;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background-color: var(--progress-bg);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: var(--primary-color);
+  transition: width 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+  border-radius: 4px;
+}
+
+#progress-text {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+/* --------------------------------------------------------------------------
+   Preview Bubble (Theme-Independent)
+   -------------------------------------------------------------------------- */
+.preview-bubble,
+.tooltip,
+.popover,
+[data-tooltip],
+[aria-label][role="tooltip"] {
+  background-color: #FFFFFF !important;
+  border: 1px solid #E5E5EA !important;
+  color: #1C1C1E !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  border-radius: 12px !important;
+  padding: 0.75rem 1rem !important;
+  font-size: 0.9rem !important;
+  max-width: 300px !important;
+  z-index: 1000 !important;
+}
+
+/* --------------------------------------------------------------------------
+   Footer
+   -------------------------------------------------------------------------- */
+.app-footer {
+  background-color: var(--header-bg);
+  border-top: 1px solid var(--border-color);
+  padding: 1.5rem 2.5rem;
+  margin-top: auto;
+}
+
+.footer-content {
+  max-width: 1800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.footer-content p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* --------------------------------------------------------------------------
+   Responsive Design
+   -------------------------------------------------------------------------- */
+@media (max-width: 992px) {
+  .main-content {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+}
+
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: flex-start;
+  }
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .cleaning-options,
+  .transform-options {
+    grid-template-columns: 1fr;
+  }
+  .viz-controls {
+    flex-direction: column;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Utility & Helper Classes
+   -------------------------------------------------------------------------- */
+.mb-1 { margin-bottom: 0.5rem !important; }
+.mb-2 { margin-bottom: 1rem !important; }
+.mb-3 { margin-bottom: 1.5rem !important; }
+.mb-4 { margin-bottom: 2rem !important; }

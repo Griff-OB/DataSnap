@@ -1,0 +1,94 @@
+/* Light Theme */
+:root {
+    --bg-color: #ffffff;
+    --text-color: #111111;
+    --text-secondary: #666666;
+    --primary-color: #3b82f6;
+    --primary-hover: #2563eb;
+    --header-bg: #f8fafc;
+    --sidebar-bg: #f1f5f9;
+    --card-bg: #ffffff;
+    --input-bg: #ffffff;
+    --secondary-bg: #f1f5f9;
+    --secondary-hover: #e2e8f0;
+    --border-color: #e2e8f0;
+    --row-even-bg: #f8fafc;
+    --row-hover-bg: #f1f5f9;
+    --progress-bg: #e2e8f0;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+    --bg-color: #0f172a;
+    --text-color: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --primary-color: #60a5fa;
+    --primary-hover: #3b82f6;
+    --header-bg: #1e293b;
+    --sidebar-bg: #1e293b;
+    --card-bg: #1e293b;
+    --input-bg: #334155;
+    --secondary-bg: #334155;
+    --secondary-hover: #475569;
+    --border-color: #334155;
+    --row-even-bg: #1e293b;
+    --row-hover-bg: #334155;
+    --progress-bg: #334155;
+}
+
+/* Ocean Theme */
+[data-theme="ocean"] {
+    --bg-color: #0d2a4c;
+    --text-color: #c5eff7;
+    --text-secondary: #7dd3fc;
+    --primary-color: #06b6d4;
+    --primary-hover: #0891b2;
+    --header-bg: #164e63;
+    --sidebar-bg: #164e63;
+    --card-bg: #164e63;
+    --input-bg: #155e75;
+    --secondary-bg: #155e75;
+    --secondary-hover: #0e7490;
+    --border-color: #155e75;
+    --row-even-bg: #164e63;
+    --row-hover-bg: #155e75;
+    --progress-bg: #155e75;
+}
+
+/* Forest Theme */
+[data-theme="forest"] {
+    --bg-color: #14532d;
+    --text-color: #dcfce7;
+    --text-secondary: #86efac;
+    --primary-color: #16a34a;
+    --primary-hover: #15803d;
+    --header-bg: #166534;
+    --sidebar-bg: #166534;
+    --card-bg: #166534;
+    --input-bg: #15803d;
+    --secondary-bg: #15803d;
+    --secondary-hover: #166534;
+    --border-color: #15803d;
+    --row-even-bg: #166534;
+    --row-hover-bg: #15803d;
+    --progress-bg: #15803d;
+}
+
+/* Sunset Theme */
+[data-theme="sunset"] {
+    --bg-color: #7c2d12;
+    --text-color: #ffedd5;
+    --text-secondary: #fdba74;
+    --primary-color: #ea580c;
+    --primary-hover: #c2410c;
+    --header-bg: #9a3412;
+    --sidebar-bg: #9a3412;
+    --card-bg: #9a3412;
+    --input-bg: #c2410c;
+    --secondary-bg: #c2410c;
+    --secondary-hover: #ea580c;
+    --border-color: #c2410c;
+    --row-even-bg: #9a3412;
+    --row-hover-bg: #c2410c;
+    --progress-bg: #c2410c;
+}

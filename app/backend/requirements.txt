@@ -1,0 +1,13 @@
+flask
+flask-cors
+flask-socketio
+pandas
+numpy
+openpyxl
+xlrd
+pyarrow
+python-magic
+waitress
+python-socketio
+llama-cpp-python
+requests

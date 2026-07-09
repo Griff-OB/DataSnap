@@ -1,0 +1,1886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataSnap - Professional Data Cleaning Tool</title>
+    <!-- Third-party libraries -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"/>
+    <link rel="stylesheet" href="lib/tabulator/tabulator.min.css">
+    <!-- Application stylesheets -->
+    <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="css/main.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Splash Screen Styles -->
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            overflow-y: auto; /* Allow scrolling */
+        }
+        
+        .splash-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0f172a; /* dark slate-900 */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 1.5s ease-in-out;
+        }
+        
+        .splash-container.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .logo-container {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            margin-bottom: 30px;
+        }
+        
+        .lens {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #334155; /* slate-700 */
+            box-shadow: 
+                0 0 20px rgba(0, 0, 0, 0.5),
+                inset 0 0 15px rgba(0, 0, 0, 0.8),
+                0 10px 25px rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        .lens-outer {
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #475569 0%, #334155 100%);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .lens-middle {
+            position: absolute;
+            width: 70%;
+            height: 70%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 40% 40%, #64748b, #334155);
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.6);
+        }
+        
+        .lens-inner {
+            position: absolute;
+            width: 45%;
+            height: 45%;
+            border-radius: 50%;
+            background: #1e293b;
+            box-shadow: 
+                inset 0 0 5px rgba(0, 0, 0, 0.8),
+                0 0 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .lens-center {
+            width: 60%;
+            height: 60%;
+            border-radius: 50%;
+            background: radial-gradient(circle at center, #0f172a, #1e293b);
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.9);
+        }
+        
+        .lens-reflection {
+            position: absolute;
+            top: 15%;
+            left: 20%;
+            width: 30%;
+            height: 30%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
+            filter: blur(2px);
+        }
+        
+        .lens-texture {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: repeating-conic-gradient(
+                from 0deg at 50% 50%,
+                #334155 0deg 2deg,
+                #475569 2deg 4deg
+            );
+            opacity: 0.3;
+            mix-blend-mode: overlay;
+        }
+        
+        .gloss-effect {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.03) 45%,
+                rgba(255, 255, 255, 0.06) 50%,
+                rgba(255, 255, 255, 0.03) 55%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(45deg);
+            animation: glossAnimation 3s ease-in-out;
+        }
+        
+        @keyframes glossAnimation {
+            0% {
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+            100% {
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+            }
+        }
+        
+        .app-name {
+            color: #e2e8f0; /* slate-200 */
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-top: 20px;
+            position: relative;
+        }
+        
+        .app-name::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: #64748b; /* slate-500 */
+            border-radius: 2px;
+        }
+        
+        .loading-dots {
+            display: flex;
+            margin-top: 30px;
+        }
+        
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #64748b; /* slate-500 */
+            margin: 0 5px;
+            animation: loadingAnimation 1.5s infinite ease-in-out;
+        }
+        
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes loadingAnimation {
+            0%, 80%, 100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+    </style>
+    
+    <!-- Inline styles for modern UI -->
+    <style>
+        :root {
+    /* Light Theme (Default) */
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F8F9FA;
+    --bg-tertiary: #E9ECEF;
+    --text-primary: #212529;
+    --text-secondary: #495057;
+    --text-tertiary: #6C757D;
+    --border-color: #DEE2E6;
+    --primary-color: #4361EE;
+    --primary-hover: #3A56D4;
+    --secondary-color: #7209B7;
+    --accent-color: #560BAD;
+    --success-color: #2A9D8F;
+    --warning-color: #E9C46A;
+    --danger-color: #E76F51;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08);
+    --border-radius-sm: 0.375rem;
+    --border-radius-md: 0.5rem;
+    --border-radius-lg: 0.75rem;
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 0.75rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --transition: all 0.3s ease;
+    
+    /* Font size variables */
+    --font-size-xs: 0.875rem;     /* 14px - for very small elements */
+    --font-size-sm: 1rem;         /* 16px - default text */
+    --font-size-md: 1.125rem;     /* 18px - for headings */
+    --font-size-lg: 1.25rem;      /* 20px - for titles */
+    --font-size-xl: 1.5rem;       /* 24px - for main headings */
+    --font-size-xxl: 1.75rem;     /* 28px - for special elements */
+}
+/* Dark Theme */
+[data-theme="dark"] {
+    --bg-primary: #1E293B;
+    --bg-secondary: #0F172A;
+    --bg-tertiary: #334155;
+    --text-primary: #F8FAFC;
+    --text-secondary: #E2E8F0;
+    --text-tertiary: #CBD5E1;
+    --border-color: #475569;
+    --primary-color: #60A5FA;
+    --primary-hover: #3B82F6;
+}
+/* Ocean Theme */
+[data-theme="ocean"] {
+    --bg-primary: #083344;
+    --bg-secondary: #041E26;
+    --bg-tertiary: #0C4A5E;
+    --text-primary: #F0FDFA;
+    --text-secondary: #CCFBF1;
+    --text-tertiary: #99F6E4;
+    --border-color: #0C4A5E;
+    --primary-color: #06B6D4;
+    --primary-hover: #0891B2;
+}
+/* Forest Theme */
+[data-theme="forest"] {
+    --bg-primary: #1B4332;
+    --bg-secondary: #081C15;
+    --bg-tertiary: #2D6A4F;
+    --text-primary: #F0FDF4;
+    --text-secondary: #DCFCE7;
+    --text-tertiary: #BBF7D0;
+    --border-color: #2D6A4F;
+    --primary-color: #22C55E;
+    --primary-hover: #16A34A;
+}
+/* Sunset Theme */
+[data-theme="sunset"] {
+    --bg-primary: #9D0208;
+    --bg-secondary: #6A0400;
+    --bg-tertiary: #E85D04;
+    --text-primary: #FFFFFF; /* Improved contrast */
+    --text-secondary: #FED7AA; /* Improved contrast */
+    --text-tertiary: #FDBA74; /* Improved contrast */
+    --border-color: #EA580C;
+    --primary-color: #F97316;
+    --primary-hover: #EA580C;
+}
+/* Purple Theme */
+[data-theme="purple"] {
+    --bg-primary: #240046;
+    --bg-secondary: #10002B;
+    --bg-tertiary: #3C096C;
+    --text-primary: #F3E8FF; /* Improved contrast */
+    --text-secondary: #E9D5FF; /* Improved contrast */
+    --text-tertiary: #D8B4FE; /* Improved contrast */
+    --border-color: #6B21A8;
+    --primary-color: #8B5CF6;
+    --primary-hover: #7C3AED;
+}
+/* Rose Theme */
+[data-theme="rose"] {
+    --bg-primary: #7B2D3E;
+    --bg-secondary: #4A0E2A;
+    --bg-tertiary: #9A1750;
+    --text-primary: #FFFFFF; /* Improved contrast */
+    --text-secondary: #FECDD3; /* Improved contrast */
+    --text-tertiary: #FBCFE8; /* Improved contrast */
+    --border-color: #BE185D;
+    --primary-color: #EC4899;
+    --primary-hover: #DB2777;
+}
+/* Amber Theme */
+[data-theme="amber"] {
+    --bg-primary: #7B5E0F;
+    --bg-secondary: #453507;
+    --bg-tertiary: #9A7C0E;
+    --text-primary: #FFFBEB;
+    --text-secondary: #FEF3C7;
+    --text-tertiary: #FDE68A;
+    --border-color: #B45309;
+    --primary-color: #F59E0B;
+    --primary-hover: #D97706;
+}
+/* Emerald Theme */
+[data-theme="emerald"] {
+    --bg-primary: #064E3B;
+    --bg-secondary: #022C22;
+    --bg-tertiary: #065F46;
+    --text-primary: #F0FDF4;
+    --text-secondary: #D1FAE5;
+    --text-tertiary: #A7F3D0;
+    --border-color: #047857;
+    --primary-color: #10B981;
+    --primary-hover: #059669;
+}
+/* Sky Theme */
+[data-theme="sky"] {
+    --bg-primary: #0369A1;
+    --bg-secondary: #0C4A6E;
+    --bg-tertiary: #0284C7;
+    --text-primary: #F0F9FF;
+    --text-secondary: #E0F2FE;
+    --text-tertiary: #BAE6FD;
+    --border-color: #0284C7;
+    --primary-color: #0EA5E9;
+    --primary-hover: #0284C7;
+}
+/* Dark Owl Theme */
+[data-theme="dark-owl"] {
+    --bg-primary: #1E293B;
+    --bg-secondary: #0F172A;
+    --bg-tertiary: #334155;
+    --text-primary: #FEF3C7;
+    --text-secondary: #FDE68A;
+    --text-tertiary: #FCD34D;
+    --border-color: #475569;
+    --primary-color: #F59E0B;
+    --primary-hover: #D97706;
+}
+        /* Base styles */
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            transition: background-color 0.4s ease, color 0.4s ease;
+            font-size: var(--font-size-sm); /* Increased base font size */
+        }
+        
+        /* App container */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+        }
+        
+        .app-container.visible {
+            opacity: 1;
+        }
+        
+        /* Header styles */
+        .app-header {
+            background-color: var(--bg-primary);
+            box-shadow: var(--shadow-sm);
+            padding: var(--spacing-md) var(--spacing-xl);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .logo-section {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .app-title {
+            font-size: var(--font-size-xl); /* Increased from 1.5rem */
+            font-weight: 700;
+            margin: 0;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .app-subtitle {
+            font-size: var(--font-size-sm); /* Increased from 0.875rem */
+            color: var(--text-secondary);
+            margin: 0;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+        
+        /* Theme selector */
+        .theme-selector {
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--border-radius-md);
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: var(--font-size-sm); /* Increased from 0.875rem */
+            transition: var(--transition);
+            min-height: 2.5rem; /* Ensure consistent height */
+        }
+        
+        .theme-selector:hover {
+            border-color: var(--primary-color);
+        }
+        
+        /* Accessibility toggle button */
+        #accessibility-toggle {
+            min-height: 2.5rem; /* Ensure consistent height */
+            padding: 0.75rem 1rem; /* Increased padding */
+            font-size: var(--font-size-sm); /* Increased from 0.875rem */
+        }
+        
+        /* Main content layout */
+        .main-content {
+            display: flex;
+            flex: 1;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            padding: var(--spacing-xl);
+            gap: var(--spacing-xl);
+        }
+        
+        /* Sidebar styles */
+        .sidebar {
+            width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+        }
+        
+        .sidebar-section {
+            background-color: var(--bg-primary);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+        
+        .sidebar-section h3 {
+            font-size: var(--font-size-md); /* Increased from 1rem */
+            font-weight: 600;
+            margin: 0 0 var(--spacing-md) 0;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        /* Button styles */
+        .btn {
+            padding: 0.75rem 1rem; /* Increased padding */
+            border-radius: var(--border-radius-md);
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-xs);
+            font-size: var(--font-size-sm); /* Increased from 0.875rem */
+            min-height: 2.5rem; /* Ensure consistent height */
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+            font-weight: 600; /* Increased weight */
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+        
+        .btn-secondary {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--border-color);
+        }
+        
+        .btn-block {
+            width: 100%;
+        }
+        
+        .btn-operation {
+            width: 100%;
+            justify-content: flex-start;
+            padding: 0.75rem 1rem; /* Increased padding */
+            background-color: transparent;
+            color: var(--text-secondary);
+            border-radius: var(--border-radius-md);
+            text-align: left;
+            border: none;
+            font-size: var(--font-size-sm); /* Increased from 0.875rem */
+        }
+        
+        .btn-operation:hover {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        
+        .btn-operation.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        /* Form controls */
+        .form-control {
+            padding: 0.75rem 1rem; /* Increased padding */
+            border-radius: var(--border-radius-md);
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+            color: var(--text-primary) !important; /* Force text color */
+            font-size: var(--font-size-sm); /* Increased from 0.875rem */
+            width: 100%;
+            transition: var(--transition);
+            margin-bottom: var(--spacing-sm);
+            min-height: 2.5rem; /* Ensure consistent height */
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        
+        /* Content area */
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+        }
+        
+        .content-section {
+            display: none;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+        }
+        
+        .content-section.active {
+            display: flex;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .section-header h2 {
+            font-size: var(--font-size-md); /* Increased from 1.25rem */
+            font-weight: 600;
+            margin: 0;
+            color: var(--text-primary);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .section-header p {
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+        }
+        
+        .section-controls {
+            display: flex;
+            gap: var(--spacing-sm);
+            align-items: center;
+        }
+        
+        .filter-input {
+            min-width: 250px;
+        }
+        
+        /* Cards */
+        .cleaning-options, .transform-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: var(--spacing-lg);
+        }
+        
+        .cleaning-card, .transform-card {
+            background-color: var(--bg-primary);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+        
+        .cleaning-card h3, .transform-card h3 {
+            font-size: var(--font-size-md); /* Increased from 1rem */
+            font-weight: 600;
+            margin: 0 0 var(--spacing-md) 0;
+            color: var(--text-primary);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .cleaning-card p, .transform-card p {
+            font-size: var(--font-size-sm); /* Increased from 0.875rem */
+            color: var(--text-primary);
+            margin: 0 0 var(--spacing-md) 0;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+        }
+        
+        /* Table container */
+        .table-container {
+            background-color: var(--bg-primary);
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+        
+        /* Pagination */
+        .pagination-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+        }
+        
+        /* Progress bar */
+        .progress-container {
+            margin-top: var(--spacing-md);
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        /* File info */
+        .file-info {
+            font-size: var(--font-size-sm); /* Increased from 0.875rem */
+            color: var(--text-secondary);
+        }
+        
+        /* Profile content */
+        .profile-content {
+            background-color: var(--bg-primary);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+        
+        /* Chart container */
+        .chart-container {
+            background-color: var(--bg-primary);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            height: 400px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .viz-controls {
+            display: flex;
+            gap: var(--spacing-md);
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .viz-controls label {
+            color: var(--text-primary);
+            font-weight: 500;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+        }
+        
+        /* AI Chat styles */
+        .chat-container-full {
+            display: flex;
+            flex-direction: column;
+            height: 75vh;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            background-color: var(--bg-primary);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+        
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: var(--spacing-lg);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+        
+        .chat-message {
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--border-radius-lg);
+            max-width: 75%;
+            line-height: 1.4;
+            word-wrap: break-word;
+            font-size: var(--font-size-sm); /* Increased from default */
+        }
+        
+        .user-message {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom-right-radius: var(--border-radius-sm);
+            align-self: flex-end;
+        }
+        
+        .ai-message {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            border-bottom-left-radius: var(--border-radius-sm);
+            align-self: flex-start;
+        }
+        
+        .chat-input-area {
+            display: flex;
+            padding: var(--spacing-md);
+            border-top: 1px solid var(--border-color);
+            gap: var(--spacing-md);
+            background-color: var(--bg-primary);
+            align-items: center;
+        }
+        
+        .chat-input-area .form-control {
+            margin-bottom: 0;
+            flex-grow: 1;
+        }
+        
+        .ai-model-prompt {
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+            background-color: var(--bg-tertiary);
+            border-radius: var(--border-radius-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border-color);
+        }
+        
+        .ai-model-prompt span {
+            color: var(--text-primary);
+            font-weight: 500;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+        }
+        
+        .chat-dataset-status {
+            font-size: var(--font-size-sm); /* Increased from 0.875rem */
+            color: var(--text-secondary);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--bg-tertiary);
+        }
+        
+        .chat-dataset-status strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        
+        #upload-chat-dataset-btn {
+            padding: var(--spacing-sm);
+            line-height: 1;
+            min-width: 40px;
+            min-height: 2.5rem; /* Ensure consistent height */
+        }
+        
+        /* Footer */
+        .app-footer {
+            background-color: var(--bg-primary);
+            padding: var(--spacing-md) var(--spacing-xl);
+            border-top: 1px solid var(--border-color);
+            margin-top: auto;
+        }
+        
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            text-align: center;
+            font-size: var(--font-size-sm); /* Increased from 0.875rem */
+            color: var(--text-secondary);
+        }
+        
+        /* Checkbox group */
+        .checkbox-group {
+            display: flex;
+            gap: var(--spacing-md);
+            margin: var(--spacing-sm) 0;
+        }
+        
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            font-size: var(--font-size-sm); /* Increased from 0.875rem */
+            color: var(--text-primary);
+            text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+        }
+        
+        /* Select dropdowns */
+        select[multiple] {
+            min-height: 120px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+            }
+        }
+        
+        /* Additional text visibility improvements */
+        .loading-dots .dot {
+            background-color: var(--text-tertiary);
+        }
+        
+        hr {
+            border-color: var(--border-color);
+        }
+        
+        .ai-model-prompt .btn-primary {
+            color: white;
+        }
+        
+        .chat-message p {
+            margin: 0;
+        }
+        
+        /* Ensure all input placeholders are visible */
+        ::placeholder {
+            color: var(--text-tertiary);
+            opacity: 0.7;
+        }
+        
+        /* Ensure all button text is visible */
+        .btn {
+            color: var(--text-primary);
+        }
+        
+        .btn-primary {
+            color: white;
+        }
+        
+        /* Ensure all icons are visible */
+        i, .fas, .far, .fab {
+            color: inherit;
+        }
+        
+        .app-title i {
+            color: var(--primary-color);
+        }
+        
+        /* Ensure all links are visible */
+        a {
+            color: var(--primary-color);
+        }
+        
+        /* Table text visibility improvements - Universal approach */
+        .tabulator {
+            background-color: var(--bg-primary) !important;
+        }
+
+        .tabulator .tabulator-header {
+            background-color: var(--bg-tertiary) !important;
+        }
+
+        .tabulator .tabulator-header .tabulator-col {
+            background-color: var(--bg-tertiary) !important;
+            color: var(--text-primary) !important;
+            border-right: 1px solid var(--border-color) !important;
+        }
+
+        .tabulator .tabulator-header .tabulator-col .tabulator-col-content {
+            padding: 0.75rem !important;
+        }
+
+        .tabulator .tabulator-tableHolder {
+            background-color: var(--bg-primary) !important;
+        }
+
+        .tabulator .tabulator-table {
+            background-color: var(--bg-primary) !important;
+        }
+
+        .tabulator .tabulator-row {
+            background-color: var(--bg-primary) !important;
+            color: var(--text-primary) !important;
+            border-bottom: 1px solid var(--border-color) !important;
+        }
+
+        .tabulator .tabulator-row:nth-child(even) {
+            background-color: var(--bg-secondary) !important;
+        }
+
+        .tabulator .tabulator-row:hover {
+            background-color: var(--bg-tertiary) !important;
+        }
+
+        .tabulator .tabulator-cell {
+            padding: 0.75rem !important;
+            border-right: 1px solid var(--border-color) !important;
+        }
+
+        /* High contrast text for all themes in tables */
+        .tabulator .tabulator-cell,
+        .tabulator .tabulator-row,
+        .tabulator .tabulator-header .tabulator-col {
+            text-shadow: 0 0 3px rgba(0,0,0,0.5) !important;
+            font-weight: 500 !important;
+        }
+
+        /* Dropdown visibility improvements */
+        .form-control,
+        .form-control option {
+            background-color: var(--bg-primary) !important;
+            color: var(--text-primary) !important;
+            text-shadow: 0 0 3px rgba(0,0,0,0.5) !important;
+            font-weight: 500 !important;
+        }
+
+        /* Specific theme fixes for table and dropdown visibility */
+        [data-theme="sunset"] .tabulator .tabulator-header .tabulator-col,
+        [data-theme="sunset"] .tabulator .tabulator-row,
+        [data-theme="sunset"] .tabulator .tabulator-cell,
+        [data-theme="sunset"] .form-control,
+        [data-theme="sunset"] .form-control option {
+            color: #FFFFFF !important;
+            text-shadow: 0 0 4px rgba(0,0,0,0.8) !important;
+        }
+        
+        [data-theme="purple"] .tabulator .tabulator-header .tabulator-col,
+        [data-theme="purple"] .tabulator .tabulator-row,
+        [data-theme="purple"] .tabulator .tabulator-cell,
+        [data-theme="purple"] .form-control,
+        [data-theme="purple"] .form-control option {
+            color: #F3E8FF !important;
+            text-shadow: 0 0 4px rgba(0,0,0,0.8) !important;
+        }
+        
+        [data-theme="rose"] .tabulator .tabulator-header .tabulator-col,
+        [data-theme="rose"] .tabulator .tabulator-row,
+        [data-theme="rose"] .tabulator .tabulator-cell,
+        [data-theme="rose"] .form-control,
+        [data-theme="rose"] .form-control option {
+            color: #FFFFFF !important;
+            text-shadow: 0 0 4px rgba(0,0,0,0.8) !important;
+        }
+        
+        [data-theme="amber"] .tabulator .tabulator-header .tabulator-col,
+        [data-theme="amber"] .tabulator .tabulator-row,
+        [data-theme="amber"] .tabulator .tabulator-cell,
+        [data-theme="amber"] .form-control,
+        [data-theme="amber"] .form-control option {
+            color: #FFFBEB !important;
+            text-shadow: 0 0 4px rgba(0,0,0,0.8) !important;
+        }
+        
+        [data-theme="dark"] .tabulator .tabulator-header .tabulator-col,
+        [data-theme="dark"] .tabulator .tabulator-row,
+        [data-theme="dark"] .tabulator .tabulator-cell,
+        [data-theme="dark"] .form-control,
+        [data-theme="dark"] .form-control option,
+        [data-theme="ocean"] .tabulator .tabulator-header .tabulator-col,
+        [data-theme="ocean"] .tabulator .tabulator-row,
+        [data-theme="ocean"] .tabulator .tabulator-cell,
+        [data-theme="ocean"] .form-control,
+        [data-theme="ocean"] .form-control option,
+        [data-theme="forest"] .tabulator .tabulator-header .tabulator-col,
+        [data-theme="forest"] .tabulator .tabulator-row,
+        [data-theme="forest"] .tabulator .tabulator-cell,
+        [data-theme="forest"] .form-control,
+        [data-theme="forest"] .form-control option,
+        [data-theme="emerald"] .tabulator .tabulator-header .tabulator-col,
+        [data-theme="emerald"] .tabulator .tabulator-row,
+        [data-theme="emerald"] .tabulator .tabulator-cell,
+        [data-theme="emerald"] .form-control,
+        [data-theme="emerald"] .form-control option,
+        [data-theme="sky"] .tabulator .tabulator-header .tabulator-col,
+        [data-theme="sky"] .tabulator .tabulator-row,
+        [data-theme="sky"] .tabulator .tabulator-cell,
+        [data-theme="sky"] .form-control,
+        [data-theme="sky"] .form-control option,
+        [data-theme="dark-owl"] .tabulator .tabulator-header .tabulator-col,
+        [data-theme="dark-owl"] .tabulator .tabulator-row,
+        [data-theme="dark-owl"] .tabulator .tabulator-cell,
+        [data-theme="dark-owl"] .form-control,
+        [data-theme="dark-owl"] .form-control option {
+            color: #FFFFFF !important;
+            text-shadow: 0 0 4px rgba(0,0,0,0.8) !important;
+        }
+
+        /* Dropdown option background colors */
+        .form-control option {
+            background-color: var(--bg-secondary) !important;
+        }
+
+        .form-control option:hover {
+            background-color: var(--bg-tertiary) !important;
+        }
+
+        /* Text shadows for better visibility in dark themes */
+        [data-theme="dark"] .app-title,
+        [data-theme="ocean"] .app-title,
+        [data-theme="forest"] .app-title,
+        [data-theme="purple"] .app-title,
+        [data-theme="rose"] .app-title,
+        [data-theme="amber"] .app-title,
+        [data-theme="emerald"] .app-title,
+        [data-theme="sky"] .app-title,
+        [data-theme="dark-owl"] .app-title {
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        [data-theme="dark"] .sidebar-section h3,
+        [data-theme="ocean"] .sidebar-section h3,
+        [data-theme="forest"] .sidebar-section h3,
+        [data-theme="purple"] .sidebar-section h3,
+        [data-theme="rose"] .sidebar-section h3,
+        [data-theme="amber"] .sidebar-section h3,
+        [data-theme="emerald"] .sidebar-section h3,
+        [data-theme="sky"] .sidebar-section h3,
+        [data-theme="dark-owl"] .sidebar-section h3 {
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        [data-theme="dark"] .section-header h2,
+        [data-theme="ocean"] .section-header h2,
+        [data-theme="forest"] .section-header h2,
+        [data-theme="purple"] .section-header h2,
+        [data-theme="rose"] .section-header h2,
+        [data-theme="amber"] .section-header h2,
+        [data-theme="emerald"] .section-header h2,
+        [data-theme="sky"] .section-header h2,
+        [data-theme="dark-owl"] .section-header h2 {
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        [data-theme="dark"] .cleaning-card h3,
+        [data-theme="ocean"] .cleaning-card h3,
+        [data-theme="forest"] .cleaning-card h3,
+        [data-theme="purple"] .cleaning-card h3,
+        [data-theme="rose"] .cleaning-card h3,
+        [data-theme="amber"] .cleaning-card h3,
+        [data-theme="emerald"] .cleaning-card h3,
+        [data-theme="sky"] .cleaning-card h3,
+        [data-theme="dark-owl"] .cleaning-card h3,
+        [data-theme="dark"] .transform-card h3,
+        [data-theme="ocean"] .transform-card h3,
+        [data-theme="forest"] .transform-card h3,
+        [data-theme="purple"] .transform-card h3,
+        [data-theme="rose"] .transform-card h3,
+        [data-theme="amber"] .transform-card h3,
+        [data-theme="emerald"] .transform-card h3,
+        [data-theme="sky"] .transform-card h3,
+        [data-theme="dark-owl"] .transform-card h3 {
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        /* High contrast mode for problematic themes */
+        [data-theme="sunset"] .app-title,
+        [data-theme="sunset"] .sidebar-section h3,
+        [data-theme="sunset"] .section-header h2,
+        [data-theme="sunset"] .cleaning-card h3,
+        [data-theme="sunset"] .transform-card h3 {
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        /* Additional contrast for text in all themes */
+        .text-high-contrast {
+            text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+        }
+        
+        /* Enhanced readability for card text on non-light themes */
+        [data-theme]:not([data-theme="light"]) .cleaning-card p,
+        [data-theme]:not([data-theme="light"]) .transform-card p,
+        [data-theme]:not([data-theme="light"]) .checkbox-group label {
+            color: var(--text-primary); /* Re-enforce high contrast */
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); /* Stronger shadow for legibility */
+        }
+
+        /* Choices.js Dropdown Stacking & Readability Fix */
+        .cleaning-card:focus-within,
+        .transform-card:focus-within {
+            position: relative; /* Needed for z-index */
+            z-index: 10;      /* Elevate the active card */
+        }
+
+        .choices__inner {
+            background-color: var(--bg-primary) !important;
+        }
+        .choices__list--dropdown {
+            background-color: var(--bg-primary) !important;
+            border: 1px solid var(--border-color) !important;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .choices__list--dropdown .choices__item--choice,
+        .choices__inner .choices__item,
+        .choices__input,
+        .choices__placeholder {
+            color: #111827 !important; /* Force a dark text color for readability */
+        }
+        
+        .choices__list--dropdown .choices__item--selectable.is-highlighted {
+            background-color: var(--bg-tertiary) !important;
+            color: #111827 !important;
+        }
+
+        .choices[data-type*="select-multiple"] .choices__inner,
+        .choices[data-type*="text"] .choices__inner {
+             border: 1px solid var(--border-color);
+        }
+
+        .is-focused .choices__inner, .is-open .choices__inner {
+            border-color: var(--primary-color) !important;
+        }
+
+        .choices__item .choices__button {
+            filter: invert(1) grayscale(1) brightness(0.5);
+            opacity: 0.75;
+        }
+        .choices__item .choices__button:hover {
+            opacity: 1;
+        }
+
+        /* --- High Contrast Text Fix for Specific Themes --- */
+        :is([data-theme="purple"], [data-theme="rose"], [data-theme="amber"], [data-theme="emerald"], [data-theme="sky"], [data-theme="dark-owl"]) .profile-content :is(h3, .stat-item, .score-label, p, li),
+        :is([data-theme="purple"], [data-theme="rose"], [data-theme="amber"], [data-theme="emerald"], [data-theme="sky"], [data-theme="dark-owl"]) :is(.cleaning-card, .transform-card) p,
+        :is([data-theme="purple"], [data-theme="rose"], [data-theme="amber"], [data-theme="emerald"], [data-theme="sky"], [data-theme="dark-owl"]) .checkbox-group label {
+            color: #1f2937 !important;
+            text-shadow: none !important;
+        }
+
+        :is([data-theme="purple"], [data-theme="rose"], [data-theme="amber"], [data-theme="emerald"], [data-theme="sky"], [data-theme="dark-owl"]) .pii-warning h3 {
+            color: #92400e !important;
+        }
+
+        /* Accessibility mode styles */
+        body.accessibility-mode {
+            --font-size-sm: 1.125rem;     /* 18px - default text */
+            --font-size-md: 1.25rem;     /* 20px - for headings */
+            --font-size-lg: 1.5rem;      /* 24px - for titles */
+            --font-size-xl: 1.75rem;     /* 28px - for main headings */
+            --font-size-xxl: 2rem;       /* 32px - for special elements */
+        }
+
+        .accessibility-mode .btn,
+        .accessibility-mode .form-control,
+        .accessibility-mode .theme-selector {
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+            min-height: 2.75rem; /* Taller buttons in accessibility mode */
+        }
+
+        .accessibility-mode .sidebar {
+            width: 320px; /* Wider sidebar */
+        }
+
+        .accessibility-mode .chat-message {
+            max-width: 85%; /* Wider chat messages */
+            line-height: 1.7;
+            font-size: 1.125rem; /* Larger chat text */
+        }
+
+        .accessibility-mode .btn-operation {
+            padding: 1rem; /* Larger operation buttons */
+        }
+
+        .accessibility-mode .checkbox-group label {
+            font-size: 1.125rem; /* Larger checkbox labels */
+            padding: 0.75rem 0;
+        }
+
+        .accessibility-mode .file-info,
+        .accessibility-mode .footer-content {
+            font-size: 1.125rem; /* Larger info text */
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="splash-container">
+        <div class="logo-container">
+            <div class="lens">
+                <div class="lens-outer"></div>
+                <div class="lens-middle"></div>
+                <div class="lens-inner">
+                    <div class="lens-center"></div>
+                </div>
+                <div class="lens-reflection"></div>
+                <div class="lens-texture"></div>
+                <div class="gloss-effect"></div>
+            </div>
+        </div>
+        <h1 class="app-name">DataSnap</h1>
+        <div class="loading-dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+    </div>
+    <div class="app-container" id="app-container">
+        <!-- =================================================================
+             Header
+        ================================================================== -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <h1 class="app-title text-high-contrast">
+                        <i class="fas fa-database"></i>
+                        DataSnap
+                    </h1>
+                    <p class="app-subtitle">Professional Data Cleaning & Analysis Tool</p>
+                </div>
+                <div class="header-actions">
+                     <select id="theme-selector" class="theme-selector" aria-label="Select a theme">
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                        <option value="ocean">Ocean</option>
+                        <option value="forest">Forest</option>
+                        <option value="sunset">Sunset</option>
+                        <option value="purple">Purple</option>
+                        <option value="rose">Rose</option>
+                        <option value="amber">Amber</option>
+                        <option value="emerald">Emerald</option>
+                        <option value="sky">Sky</option>
+                        <option value="dark-owl">Dark Owl</option>
+                    </select>
+                    <button id="accessibility-toggle" class="btn btn-secondary" title="Toggle Accessibility Mode">
+                        <i class="fas fa-universal-access"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+        <!-- =================================================================
+             Main Content Wrapper
+        ================================================================== -->
+        <main class="main-content">
+            <!-- =================================================================
+                 Sidebar
+            ================================================================== -->
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3 class="text-high-contrast"><i class="fas fa-upload"></i> Data Source</h3>
+                    <div class="upload-section">
+                        <input type="file" id="file-input" accept=".csv,.xlsx,.xls,.json,.parquet,.tsv" style="display: none;">
+                        <button id="upload-btn" class="btn btn-primary btn-block">
+                            <i class="fas fa-cloud-upload-alt"></i> Upload Data File
+                        </button>
+                        <div id="upload-progress" class="progress-container" style="display: none;">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progress-fill"></div>
+                            </div>
+                            <span id="progress-text">0%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-section">
+                    <h3 class="text-high-contrast"><i class="fas fa-tools"></i> Operations</h3>
+                    <div class="operation-buttons">
+                        <button class="btn btn-operation active" data-section="preview">
+                            <i class="fas fa-table"></i> Data Preview
+                        </button>
+                        <button class="btn btn-operation" data-section="profile">
+                            <i class="fas fa-chart-pie"></i> Data Profile
+                        </button>
+                        <button class="btn btn-operation" data-section="cleaning">
+                            <i class="fas fa-broom"></i> Data Cleaning
+                        </button>
+                        <button class="btn btn-operation" data-section="transform">
+                            <i class="fas fa-exchange-alt"></i> Transform
+                        </button>
+                        <button class="btn btn-operation" data-section="visualize">
+                            <i class="fas fa-chart-bar"></i> Visualize
+                        </button>
+                        <button class="btn btn-operation" data-section="ai-chat">
+                            <i class="fas fa-robot"></i> AI Chat
+                        </button>
+                    </div>
+                </div>
+                <div class="sidebar-section">
+                    <h3 class="text-high-contrast"><i class="fas fa-save"></i> Session & Export</h3>
+                    <div class="session-options">
+                        <button id="save-session" class="btn btn-secondary btn-block">
+                            <i class="fas fa-save"></i> Save Session
+                        </button>
+                        <button id="load-session" class="btn btn-secondary btn-block">
+                            <i class="fas fa-folder-open"></i> Load Session
+                        </button>
+                    </div>
+                    <hr style="margin: var(--spacing-md) 0; border-color: var(--border-color); border-style: solid; border-width: 1px 0 0 0;">
+                    <div class="export-options">
+                        <select id="export-format" class="form-control" aria-label="Select export format">
+                            <option value="csv">Export as CSV</option>
+                            <option value="xlsx">Export as Excel (XLSX)</option>
+                            <option value="json">Export as JSON</option>
+                            <option value="parquet">Export as Parquet</option>
+                        </select>
+                        <input type="text" id="export-filename" class="form-control" placeholder="export.csv">
+                        <button id="export-data-btn" class="btn btn-primary btn-block">
+                            <svg role="img" aria-label="Export Icon" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg" style="height: 2.4em; width: 2.9em; flex-shrink: 0;">
+                                <defs>
+                                  <linearGradient id="arrowGrad" x1="0.3" y1="0" x2="0.7" y2="1">
+                                    <stop offset="0%" stop-color="#FEEA73" />
+                                    <stop offset="100%" stop-color="#F7C941" />
+                                  </linearGradient>
+                                </defs>
+                                
+                                <!-- Database -->
+                                <g transform="translate(0, 5)">
+                                  <ellipse cx="20" cy="15" rx="18" ry="6" fill="#f08080" />
+                                  <path d="M 2,15 V 38 A 18,6 0 0,0 38,38 V 15" fill="#f08080" />
+                                  <line x1="2" y1="15" x2="38" y2="15" stroke="#d97272" stroke-width="1" />
+                                  <ellipse cx="20" cy="22" rx="18" ry="6" fill="none" stroke="#d97272" stroke-width="1.5" />
+                                  <ellipse cx="20" cy="30" rx="18" ry="6" fill="none" stroke="#d97272" stroke-width="1.5" />
+                                  <ellipse cx="20" cy="38" rx="18" ry="6" fill="#f08080" stroke="#d97272" stroke-width="1.5" />
+                                </g>
+                                
+                                <!-- Folder -->
+                                <path d="M 98,30 v20 a3,3 0 0 1 -3,3 H63 a3,3 0 0 1 -3,-3 V20 a3,3 0 0 1 3,-3 h8 l5,-5 h16 a3,3 0 0 1 3,3 Z" fill="#60a5fa" />
+                                
+                                <!-- Arrow -->
+                                <g>
+                                    <path d="M 40,8 C 50,-8 75,0 80,25" stroke="url(#arrowGrad)" stroke-width="6" fill="none" stroke-linecap="round"/>
+                                    <polygon points="80,25 88,23 78,32" fill="url(#arrowGrad)" transform="rotate(10 82 26)"/>
+                                </g>
+                            </svg>
+                            <span>Export Data</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="sidebar-section">
+                    <h3 class="text-high-contrast"><i class="fas fa-info-circle"></i> File Info</h3>
+                    <div id="file-info" class="file-info">
+                        <p>No file loaded</p>
+                    </div>
+                </div>
+            </aside>
+            <!-- =================================================================
+                 Content Area
+            ================================================================== -->
+            <div class="content-area">
+                <!-- Data Preview Section -->
+                <section id="preview-section" class="content-section active">
+                    <div class="section-header">
+                        <h2 class="text-high-contrast">Data Preview</h2>
+                        <div class="section-controls">
+                            <input type="text" id="global-filter" placeholder="Filter data..." class="form-control filter-input">
+                            <button id="refresh-data" class="btn btn-secondary">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <div id="data-table"></div>
+                    </div>
+                    <div class="pagination-controls">
+                        <button id="prev-page" class="btn btn-secondary">
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </button>
+                        <span id="page-info">Page 1 of 1</span>
+                        <button id="next-page" class="btn btn-secondary">
+                            Next <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </section>
+                <!-- Data Profile Section -->
+                <section id="profile-section" class="content-section">
+                    <div class="section-header">
+                        <h2 class="text-high-contrast">Data Profile & Quality</h2>
+                        <button id="analyze-data" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Analyze Data
+                        </button>
+                    </div>
+                    <div id="profile-content" class="profile-content">
+                        <p>Click "Analyze Data" to generate a comprehensive data profile and quality report.</p>
+                    </div>
+                </section>
+                <!-- Data Cleaning Section -->
+                <section id="cleaning-section" class="content-section">
+                    <div class="section-header">
+                        <h2 class="text-high-contrast">Data Cleaning Tools</h2>
+                        <p>Apply operations to all columns, or select specific ones.</p>
+                    </div>
+                    <div class="cleaning-options">
+                        <div class="cleaning-card">
+                            <h3 class="text-high-contrast"><i class="fas fa-magic"></i> Handle Missing Values</h3>
+                            <select id="missing-columns" multiple class="form-control"></select>
+                            <select id="missing-method" class="form-control">
+                                <option value="remove">Remove Rows</option>
+                                <option value="fill_mean">Fill with Mean</option>
+                                <option value="fill_median">Fill with Median</option>
+                                <option value="forward_fill">Forward Fill (ffill)</option>
+                                <option value="backward_fill">Backward Fill (bfill)</option>
+                                <option value="fill_value">Fill with Custom Value</option>
+                            </select>
+                            <input type="text" id="fill-value" placeholder="Enter fill value" class="form-control" style="display: none;">
+                            <button id="handle-missing" class="btn btn-primary">
+                                <i class="fas fa-check"></i> Apply
+                            </button>
+                        </div>
+                        <div class="cleaning-card">
+                            <h3 class="text-high-contrast"><i class="fas fa-copy"></i> Remove Duplicates</h3>
+                            <p>Check for duplicates across all columns or a specific subset.</p>
+                            <select id="duplicate-columns" multiple class="form-control"></select>
+                            <button id="remove-duplicates" class="btn btn-primary">
+                                <i class="fas fa-trash-alt"></i> Remove Duplicates
+                            </button>
+                        </div>
+                        <div class="cleaning-card">
+                            <h3 class="text-high-contrast"><i class="fas fa-chart-line"></i> Handle Outliers (IQR)</h3>
+                            <p>Applies to numeric columns only.</p>
+                            <select id="outlier-columns" multiple class="form-control"></select>
+                            <select id="outlier-method" class="form-control">
+                                <option value="remove">Remove Outlier Rows</option>
+                                <option value="nullify">Convert Outliers to Null</option>
+                                <option value="cap">Cap Outlier Values</option>
+                            </select>
+                            <button id="handle-outliers" class="btn btn-primary">
+                                <i class="fas fa-check"></i> Apply
+                            </button>
+                        </div>
+                        <div class="cleaning-card">
+                            <h3 class="text-high-contrast"><i class="fas fa-font"></i> String Operations</h3>
+                            <p>Applies to text columns only.</p>
+                            <select id="string-op-columns" multiple class="form-control"></select>
+                            <select id="string-operation" class="form-control">
+                                <option value="trim">Trim Whitespace</option>
+                                <option value="lower">Lowercase</option>
+                                <option value="upper">Uppercase</option>
+                                <option value="title">Title Case</option>
+                            </select>
+                            <button id="apply-string-ops" class="btn btn-primary">
+                                <i class="fas fa-check"></i> Apply
+                            </button>
+                        </div>
+                        <div class="cleaning-card">
+                            <h3 class="text-high-contrast"><i class="fas fa-search"></i> Find and Replace</h3>
+                            <p>Replaces text in selected columns. Leave "Replace" empty to delete.</p>
+                            <select id="find-replace-columns" multiple class="form-control"></select>
+                            <input type="text" id="find-value" placeholder="Find text..." class="form-control">
+                            <input type="text" id="replace-value" placeholder="Replace with..." class="form-control">
+                            <div class="checkbox-group">
+                                <label><input type="checkbox" id="match-case"> Match Case</label>
+                                <label><input type="checkbox" id="use-regex"> Use Regex</label>
+                            </div>
+                            <button id="apply-find-replace" class="btn btn-primary">
+                                <i class="fas fa-check"></i> Apply
+                            </button>
+                        </div>
+                        <div class="cleaning-card">
+                            <h3 class="text-high-contrast"><i class="fas fa-envelope"></i> Validate Emails</h3>
+                            <p>Clear invalid email cells or remove the entire row.</p>
+                            <select id="email-validation-columns" multiple class="form-control"></select>
+                            <select id="email-validation-action" class="form-control">
+                                <option value="clear">Clear Invalid Emails</option>
+                                <option value="remove_row">Remove Rows with Invalid Emails</option>
+                            </select>
+                            <button id="apply-email-validation" class="btn btn-primary">
+                                <i class="fas fa-check"></i> Apply
+                            </button>
+                        </div>
+                    </div>
+                </section>
+                <!-- Data Transformation Section -->
+                <section id="transform-section" class="content-section">
+                    <div class="section-header">
+                        <h2 class="text-high-contrast">Data Transformation</h2>
+                    </div>
+                    <div class="transform-options">
+                        <div class="transform-card">
+                            <h3 class="text-high-contrast"><i class="fas fa-sort"></i> Sort Data</h3>
+                            <select id="sort-column" class="form-control"><option value="">Select column to sort by</option></select>
+                            <select id="sort-order" class="form-control">
+                                <option value="asc">Ascending</option>
+                                <option value="desc">Descending</option>
+                            </select>
+                            <button id="sort-data" class="btn btn-primary">
+                                <i class="fas fa-check"></i> Sort
+                            </button>
+                        </div>
+                        <div class="transform-card">
+                            <h3 class="text-high-contrast"><i class="fas fa-layer-group"></i> Group By & Aggregate</h3>
+                            <select id="group-column" class="form-control"><option value="">Select grouping column</option></select>
+                            <select id="agg-column" class="form-control"><option value="">Select value column</option></select>
+                            <select id="agg-function" class="form-control">
+                                <option value="sum">Sum</option>
+                                <option value="mean">Mean</option>
+                                <option value="count">Count</option>
+                                <option value="min">Min</option>
+                                <option value="max">Max</option>
+                            </select>
+                            <button id="group-data" class="btn btn-primary">
+                                <i class="fas fa-check"></i> Group
+                            </button>
+                        </div>
+                        <div class="transform-card">
+                            <h3 class="text-high-contrast"><i class="fas fa-calculator"></i> Add Calculated Column</h3>
+                            <input type="text" id="calc-column-name" placeholder="New column name" class="form-control">
+                            <input type="text" id="calc-expression" placeholder="e.g., col1 * col2" class="form-control">
+                            <button id="add-calc-column" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Add Column
+                            </button>
+                        </div>
+                    </div>
+                </section>
+                <!-- Visualization Section -->
+                <section id="visualize-section" class="content-section">
+                    <div class="section-header">
+                        <h2 class="text-high-contrast">Data Quality Visualization</h2>
+                        <p>Generate charts based on the overall data quality profile.</p>
+                    </div>
+                    <div id="quality-chart-controls">
+                        <div class="viz-controls">
+                            <button id="generate-quality-chart" class="btn btn-primary">
+                                <i class="fas fa-chart-pie"></i> Generate Quality Charts
+                            </button>
+                        </div>
+                    </div>
+                    <div class="charts-grid-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                         <div class="chart-container">
+                            <canvas id="row-quality-chart"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="cell-quality-chart"></canvas>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- AI Chat Section -->
+                <section id="ai-chat-section" class="content-section">
+                    <div class="section-header">
+                        <h2 class="text-high-contrast"><i class="fas fa-robot"></i> AI Assistant</h2>
+                        <p>Ask questions about your data or get cleaning suggestions.</p>
+                    </div>
+                    <div id="ai-model-prompt" class="ai-model-prompt" style="display: none;">
+                        <span>Download A.I. model to enable chat (approx. 2.1 GB)</span>
+                        <button id="download-ai-model-btn" class="btn btn-primary">Download</button>
+                    </div>
+                     <div id="model-download-progress-container" class="progress-container" style="display: none; margin-bottom: var(--spacing-md);">
+                        <div class="progress-bar"><div class="progress-fill" id="model-download-progress-fill"></div></div>
+                        <span id="model-download-progress-text">0%</span>
+                    </div>
+                    <div class="chat-container-full">
+                        <!-- Dataset status indicator -->
+                        <div id="chat-dataset-status" class="chat-dataset-status" style="display: none;">
+                            Active dataset: <strong>None</strong>
+                        </div>
+                        <div class="chat-messages" id="chat-messages">
+                            <div class="chat-message ai-message"><p>Hello! I'm your local AI Assistant. Upload a CSV or Excel file to begin asking questions about your data.</p></div>
+                        </div>
+                        <div class="chat-input-area">
+                            <!-- Hidden file input and upload button -->
+                            <input type="file" id="chat-dataset-input" style="display: none;" accept=".csv,.xlsx,.xls">
+                            <button id="upload-chat-dataset-btn" class="btn btn-secondary" title="Upload Dataset for Chat" disabled>📎</button>
+                            <input type="text" id="chat-input" class="form-control" placeholder="Upload a dataset to start..." disabled>
+                            <button id="send-chat-message" class="btn btn-primary" disabled>Send</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+        <!-- =================================================================
+             Footer
+        ================================================================== -->
+        <footer class="app-footer">
+            <div class="footer-content">
+                <p>&copy; 2025 DataSnap. Professional data cleaning and analysis tool.</p>
+            </div>
+        </footer>
+    </div>
+    <!-- Hidden file inputs -->
+    <input type="file" id="session-input" accept=".json" style="display: none;">
+    <!-- =================================================================
+         Scripts
+    ================================================================== -->
+    <script src="lib/tabulator/tabulator.min.js"></script>
+    <script src="lib/chart.js/chart.min.js"></script>
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/file-upload.js"></script>
+    <script src="js/socket.js"></script>
+    <script src="js/main.js"></script>
+    
+    <!-- Splash Screen and Theme Initialization Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const splashScreen = document.getElementById('splash-screen');
+            const appContainer = document.getElementById('app-container');
+            const themeSelector = document.getElementById('theme-selector');
+            const accessibilityToggle = document.getElementById('accessibility-toggle');
+            
+            // Apply saved theme immediately
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.body.setAttribute('data-theme', savedTheme);
+            themeSelector.value = savedTheme;
+            
+            // Check for saved accessibility preference
+            if (localStorage.getItem('accessibility-mode') === 'true') {
+                document.body.classList.add('accessibility-mode');
+            }
+            
+            // Set up theme change listener
+            themeSelector.addEventListener('change', function() {
+                const selectedTheme = this.value;
+                document.body.setAttribute('data-theme', selectedTheme);
+                localStorage.setItem('theme', selectedTheme);
+            });
+            
+            // Set up accessibility toggle
+            accessibilityToggle.addEventListener('click', function() {
+                document.body.classList.toggle('accessibility-mode');
+                localStorage.setItem('accessibility-mode', document.body.classList.contains('accessibility-mode'));
+            });
+            
+            // Fade out splash screen after 3 seconds
+            setTimeout(() => {
+                splashScreen.classList.add('fade-out');
+                
+                // Show app container after fade out animation starts
+                appContainer.classList.add('visible');
+                
+                // Remove splash screen from DOM after fade out animation completes
+                setTimeout(() => {
+                    splashScreen.style.display = 'none';
+                }, 1500);
+            }, 3000);
+        });
+    </script>
+    
+    <!-- Enhanced JavaScript for full AI Chat functionality -->
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Original chat elements
+        const chatInput = document.getElementById('chat-input');
+        const sendMessageBtn = document.getElementById('send-chat-message');
+        const messagesContainer = document.getElementById('chat-messages');
+        
+        // AI model download elements
+        const modelPrompt = document.getElementById('ai-model-prompt');
+        const downloadModelBtn = document.getElementById('download-ai-model-btn');
+        const downloadProgressContainer = document.getElementById('model-download-progress-container');
+        const downloadProgressBar = document.getElementById('model-download-progress-fill');
+        const downloadProgressText = document.getElementById('model-download-progress-text');
+        
+        // AI chat dataset upload elements
+        const uploadChatDatasetBtn = document.getElementById('upload-chat-dataset-btn');
+        const chatDatasetInput = document.getElementById('chat-dataset-input');
+        const chatDatasetStatus = document.getElementById('chat-dataset-status');
+        
+        let activeAIMessageElement = null;
+        // Function to check model status and update UI
+        async function checkModelStatus() {
+            try {
+                const response = await fetch('/api/ai/status');
+                const data = await response.json();
+                if (data.model_exists) {
+                    modelPrompt.style.display = 'none';
+                    downloadProgressContainer.style.display = 'none';
+                    chatInput.disabled = false;
+                    sendMessageBtn.disabled = false;
+                    uploadChatDatasetBtn.disabled = false; // Enable dataset upload
+                    chatInput.placeholder = 'Upload a dataset or ask a general question...';
+                } else {
+                    modelPrompt.style.display = 'flex';
+                    chatInput.disabled = true;
+                    sendMessageBtn.disabled = true;
+                    uploadChatDatasetBtn.disabled = true; // Disable dataset upload
+                    chatInput.placeholder = 'Download the AI model to begin.';
+                }
+            } catch (error) {
+                console.error('Error checking AI model status:', error);
+                modelPrompt.style.display = 'flex';
+            }
+        }
+        // Function to add a message to the chat window
+        function addMessage(text, sender) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('chat-message', `${sender}-message`);
+            const p = document.createElement('p');
+            p.textContent = text;
+            messageElement.appendChild(p);
+            messagesContainer.appendChild(messageElement);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            return messageElement;
+        }
+        
+        // Function to handle sending a message
+        function sendMessage() {
+            const messageText = chatInput.value.trim();
+            if (messageText && !sendMessageBtn.disabled) {
+                addMessage(messageText, 'user');
+                if (window.socketManager) {
+                    activeAIMessageElement = addMessage('', 'ai');
+                    activeAIMessageElement.querySelector('p').textContent = 'Thinking...';
+                    window.socketManager.send('chat_message', { message: messageText });
+                }
+                chatInput.value = '';
+            }
+        }
+        // Event listeners
+        sendMessageBtn.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        // Listener for the download model button
+        downloadModelBtn.addEventListener('click', async () => {
+            downloadModelBtn.disabled = true;
+            downloadModelBtn.textContent = 'Starting...';
+            try {
+                await fetch('/api/ai/download-model', { method: 'POST' });
+                modelPrompt.style.display = 'none';
+                downloadProgressContainer.style.display = 'block';
+            } catch (error) {
+                console.error('Failed to start download:', error);
+                window.ui.showNotification('Failed to start download.', 'error');
+                downloadModelBtn.disabled = false;
+                downloadModelBtn.textContent = 'Download';
+            }
+        });
+        // Listeners for the chat dataset upload button
+        uploadChatDatasetBtn.addEventListener('click', () => chatDatasetInput.click());
+        chatDatasetInput.addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            uploadChatDatasetBtn.textContent = '...';
+            const formData = new FormData();
+            formData.append('file', file);
+            try {
+                const response = await fetch('/api/ai/upload-chat-dataset', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    window.ui.showNotification(result.message, 'success');
+                    chatDatasetStatus.style.display = 'block';
+                    chatDatasetStatus.querySelector('strong').textContent = result.filename;
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                window.ui.showNotification(`Error: ${error.message}`, 'error');
+                chatDatasetStatus.style.display = 'none';
+            } finally {
+                uploadChatDatasetBtn.textContent = '📎';
+                chatDatasetInput.value = ''; // Reset file input
+            }
+        });
+        // Socket.IO event handlers
+        if (window.socketManager) {
+            window.socketManager.on('download_progress', (data) => {
+                const progress = data.progress.toFixed(2);
+                downloadProgressBar.style.width = `${progress}%`;
+                downloadProgressText.textContent = `Downloading model... ${progress}%`;
+            });
+            window.socketManager.on('download_complete', () => {
+                window.ui.showNotification('Model download complete!', 'success');
+                downloadProgressContainer.style.display = 'none';
+                checkModelStatus();
+            });
+            
+            window.socketManager.on('download_error', (data) => {
+                window.ui.showNotification(data.message, 'error');
+                downloadProgressContainer.style.display = 'none';
+                checkModelStatus();
+            });
+            window.socketManager.on('ai_response_chunk', (data) => {
+                if (activeAIMessageElement) {
+                    const p = activeAIMessageElement.querySelector('p');
+                    if (p.textContent === 'Thinking...') p.textContent = '';
+                    p.textContent += data.chunk;
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
+            });
+            window.socketManager.on('ai_response_end', () => {
+                activeAIMessageElement = null;
+            });
+            window.socketManager.on('ai_error', (data) => {
+                window.ui.showNotification(data.message, 'error');
+                if(activeAIMessageElement) {
+                    activeAIMessageElement.querySelector('p').textContent = `Error: ${data.message}`;
+                }
+            });
+        }
+        // Check status when the AI tab is made visible
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === 'class' && document.getElementById('ai-chat-section').classList.contains('active')) {
+                    checkModelStatus();
+                }
+            });
+        });
+        observer.observe(document.getElementById('ai-chat-section'), { attributes: true });
+    });
+    </script>
+</body>
+</html>
