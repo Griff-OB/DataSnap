@@ -35,27 +35,28 @@ An optional local AI assistant can also provide dataset explanations and cleanin
 
 ### Home Screen
 
-![DataSnap Home Screen](screenshots/homescreen.png)
+![DataSnap Home Screen](./screenshots/homescreen.png)
 
 ### Data Cleaning
 
-![Data Cleaning Tools](screenshots/datacleaningsection.png)
+![Data Cleaning Tools](./screenshots/datacleaningsection.png)
 
 ### Data Profiling
 
-![Data Profiling](screenshots/dataprofilingsection.png)
+![Data Profiling](./screenshots/dataprofilingsection.png)
 
 ### Charts and Visualizations
 
-![Charts and Visualizations](screenshots/chartsanddiagramsection.png)
+![Charts and Visualizations](./screenshots/chartsanddiagramssection.png)
 
 ### Data Transformation
 
-![Data Transformation](screenshots/transformedsection.png)
+![Data Transformation](./screenshots/transformsection.png)
 
 ### Local AI Assistant
 
-![Local AI Assistant](screenshots/aiassistentsection.png)
+![Local AI Assistant](./screenshots/aiassistantsection.png)
+
 
 ---
 
