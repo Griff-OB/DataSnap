@@ -1,0 +1,46 @@
+{
+  "name": "data-wrangler",
+  "version": "1.0.0",
+  "description": "A professional data cleaning tool",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:py": "python -m PyInstaller app/backend/app.py --name app --distpath ./app/backend-dist --workpath ./build/pyinstaller --onedir --windowed --clean --noconfirm --hidden-import engineio.async_drivers.threading --add-binary \".venv/Lib/site-packages/llama_cpp/lib;llama_cpp/lib\" --add-data \"app/frontend;frontend\"",
+    "prebuild": "npm run build:py",
+    "build": "electron-builder"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^25.9.8",
+    "electron-builder": "^24.13.3",
+    "pyinstaller-hooks-contrib": "^2024.7"
+  },
+  "build": {
+    "appId": "com.datasnap.app",
+    "productName": "DataSnap",
+    "files": [
+      "main.js",
+      "preload.js"
+    ],
+    "extraResources": [
+      {
+        "from": "app/backend-dist/app",
+        "to": "app-backend"
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "app/frontend/assets/icons/app-icon.png"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "app/frontend/assets/icons/app-icon.icns"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "app/frontend/assets/icons/app-icon.png"
+    }
+  }
+}
